@@ -1,0 +1,177 @@
+---
+title: "QualityControlForMaxQuantOutput"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{QualityControlForMaxQuantOutput}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = F}
+library(QCCFR)
+```
+
+# Performing QC of proteinGroups.txt or Phospho (STY)sites.txt
+## 1. Import table.
+
+There are two functions, one for each proteinGroups and STY
+```{r eval = F}
+proteinGroups <- 
+  read_proteinGroups(
+    folderPath = "~/data",    # Set this to wherever your data is saved
+    
+    pattern = "^P_",           # In the example data, the proteome samples
+    # all have "P_" at the start of the column name
+    # Often our experiments will have "STY" or "PRO" in the
+    # name that can ber used here to differentiate.
+    quantification = "LFQ"   # This was a label free experiment
+  )
+# If this was a SILAC experiment, I would also optionally set the parameter
+# SILAC ratios, to specify which columns I'm interested in. See the
+# documentation for details.
+
+phosphoSTYsites <- 
+  read_phosphoSTY(
+    folderPath = "~/data",    # Set this to wherever your data is saved
+    
+    pattern = "^LPS",# In the example data, the phosphoproteome samples
+    # all have "LPS" at the start of the column name.
+    # Often our experiments will have "STY" or "PRO" in the
+    # name that can ber used here to differentiate.
+    quantification = "LFQ"  
+  )
+
+```
+
+## 2. Filter the table
+Proteins/sites are removed if they match the following criteria\
+- **Potential Contaminants** \
+- **Reverse** i.e. peptides that match the decoy peptides in the search engine\
+- **Proteins/sites identified but not quantified** (incomplete cases)\
+Protein Groups only:\
+- **Only identified by site** (for protein groups)\
+- **Razor / unique peptides >1**\
+- **`Unique + razor sequence coverage [%]` >= 5**\
+```{r}
+proteinGroups_flt <- 
+  filter_proteinGroups(
+    proteinGroups,            # Output of read_proteinGroups()
+    quantification = "LFQ"
+  )
+```
+Phospho(STY) only:\
+- **Localisation probability > 0.7**\
+```{r}
+phosphoSTYSites_flt <- 
+  filter_sty(
+    phosphoSTYSites,            # Output of read_phosphoSTY()
+    quantification = "LFQ"
+  )
+```
+
+## 3. Normalise the data
+All the following functions work the same regardless of whether you pass a proteinGroups or STY table to them :)
+```{r}
+proteinGroups_flt_norm <- 
+  normaliseData(
+    proteinGroups_flt,      # Output of filter_proteinGroups
+    quantification = "LFQ"
+  )
+```
+
+`proteinGroups_flt_norm` is a list with two components:\
+
+* **dat** a dataframe of the normalised data\
+* **plots** two plots, one eac of the pre-normalised and post-normalised data
+```{r echo = F, results = "asis"}
+knitr::kable(head(proteinGroups_flt_norm$dat))
+proteinGroups_flt_norm$plots
+```
+
+### Steps 1-3 can also be done as a dplyr pipe:
+```{r eval = FALSE}
+read_proteinGroups(
+  folderPath = "~/data",   
+  pattern = "^P_",        
+  quantification = "LFQ"  
+) %>% 
+  filter_proteinGroups(quantification = "LFQ") %>% 
+  normaliseData(quantification = "LFQ")
+```
+
+## 4. Visualisation
+```{r}
+pca_plot(proteinGroups_flt_norm,
+         quantification = "LFQ",
+         colour_grp_pattern = "_0[0123]"  # Using regex, group your 
+         # experimental conditions.
+         # Along with shape_grp_pattern and colour_scale, these are
+         # optional parameters!
+)
+```
+
+```{r}
+cor_plot(proteinGroups_flt_norm,
+         quantification = "LFQ")
+```
+```{r}
+count_plot(proteinGroups_flt_norm,
+           quantification = "LFQ")
+```
+
+# Performing QC ofmodificationSpecificPeptides.txt
+## 1. Read data
+```{reval = F}
+modsp <- read_modSpPeptides(path, 
+                            quantification = "LFQ")
+```
+
+## 2. Visualise characteristics of phosphorylated peptides
+```{r}
+pies <- modificationCharacteristics(
+  phosphoSTYSites,                      # Note that this takes STY table also
+  modificationSpecificPeptides, 
+  quantification = "LFQ"
+  )
+pies
+```
+
+Note: You can use the `patchwork` library to join these plots into one graphic:
+```{r eval = F}
+library(patchwork)
+pies[[1]] + pies[[2]] + pies[[3]]
+```
+
+## 3. Calculate enrichment efficiency of phosphorylated peptides:
+```{r}
+phosphoenrichment(modificationSpecificPeptides,
+                  quantification = "LFQ",
+                  pattern = " LPS_")
+```
+
+
+
+# Evidence.txt
+```{r eval = F}
+evidence <- read_evidence(
+  folderPath = "~/data"
+)
+```
+
+```{r}
+massErrorDensity(evidence) # This looks more impressive with more than 50
+# peptides to visualise :)
+andromedaScorePlot(evidence)
+```
+
+If you just want a subset of the samples you can specify the required experiments using **pattern** which takes a regex string argument:
+```{r}
+massErrorDensity(evidence, pattern = " LPS_")
+```

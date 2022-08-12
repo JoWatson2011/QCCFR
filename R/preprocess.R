@@ -136,7 +136,7 @@ filter_proteinGroups <- function(proteinGroups,
 normaliseData <- function(filteredData,
                           quantification = c("LFQ", "SILAC")){
 
-  if(class(filteredData) != "data.frame"){
+  if(!"data.frame" %in% class(filteredData)){
     stop("Please pass data frame output of filter_proteinGroups or filter_sty")
   }
 
@@ -246,7 +246,7 @@ normaliseData <- function(filteredData,
 
 imputeTruncNorm <- function(filteredData){
 
-  if(class(filteredData) != "data.frame"){
+  if(!"data.frame" %in% class(filteredData)){
     stop("Please pass data frame output of filter_proteinGroups or filter_sty")
   }
 

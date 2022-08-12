@@ -154,7 +154,7 @@ phosphoenrichment <- function(modsp,
 
   phosphoenrichment <-
     nrow(modsp_flt[modsp_flt$`Phospho (STY)` > 0 ,]) /
-    nrow(modsp_flt) *100
+    nrow(modsp_flt)
 
   return(phosphoenrichment)
 }

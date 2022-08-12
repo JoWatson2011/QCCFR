@@ -1,9 +1,9 @@
 Package: QCCFR
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Francavilla QC Protocol for MaxQuant Output Files
+Version: 1.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Jo", "Watson", , "joanne.watson@manchester.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-0000-0002-7754-276X"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -23,3 +23,7 @@ Depends:
 LazyData: true
 URL: https://github.com/JoWatson2011/QCCFR
 BugReports: https://github.com/JoWatson2011/QCCFR/issues
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

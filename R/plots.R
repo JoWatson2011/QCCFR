@@ -18,7 +18,7 @@
 cor_plot <- function(normDat,
                      quantification = c("LFQ", "SILAC")) {
 
-  if(class(normDat) == "list" &
+  if("list" %in% class(normDat) &
      all(names(normDat) %in% c("dat", "plots"))){
     normDat <- normDat$dat
   } else if(!"data.frame" %in% class(normDat) |
@@ -129,7 +129,7 @@ pca_plot <- function(normDat,
                      shape_grp_pattern = NULL,
                      colour_scale = NULL) {
 
-  if(class(normDat) == "list" &
+  if("list" %in% class(normDat) &
      all(names(normDat) %in% c("dat", "plots"))){
     normDat <- normDat$dat
   } else if(!"data.frame" %in% class(normDat) |
@@ -305,7 +305,7 @@ count_plot <- function(normDat,
                        quantification = c("LFQ", "SILAC"),
                        rep_pattern = "_0?[1-9]$") {
 
-  if(class(normDat) == "list" &
+  if("list" %in% class(normDat) &
      all(names(normDat) %in% c("dat", "plots"))){
     normDat <- normDat$dat
   } else if(!"data.frame" %in% class(normDat) |

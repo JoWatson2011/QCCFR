@@ -21,8 +21,8 @@ cor_plot <- function(normDat,
   if(class(normDat) == "list" &
      all(names(normDat) %in% c("dat", "plots"))){
     normDat <- normDat$dat
-  } else if(class(normDat) != "dataFrame" |
-            !any("Gene names" %in% colnames(normDat))){
+  } else if(class(normDat) != "data.frame" |
+            !"Gene names" %in% colnames(normDat)){
     stop("Please assign normalised data output from normaliseData() function OR
          a MaxQuant output table to the normDat argument.")
   }
@@ -132,8 +132,8 @@ pca_plot <- function(normDat,
   if(class(normDat) == "list" &
      all(names(normDat) %in% c("dat", "plots"))){
     normDat <- normDat$dat
-  } else if(class(normDat) != "dataFrame" |
-            !any("Gene names" %in% colnames(normDat))){
+  } else if(class(normDat) != "data.frame" |
+            !"Gene names" %in% colnames(normDat)){
     stop("Please assign normalised data output from normaliseData() function OR
          a MaxQuant output table to the normDat argument.")
   }
@@ -308,8 +308,8 @@ count_plot <- function(normDat,
   if(class(normDat) == "list" &
      all(names(normDat) %in% c("dat", "plots"))){
     normDat <- normDat$dat
-  } else if(class(normDat) != "dataFrame" |
-            !any("Gene names" %in% colnames(normDat))){
+  } else if(class(normDat) != "data.frame" |
+            !"Gene names" %in% colnames(normDat)){
     stop("Please assign normalised data output from normaliseData() function OR
          a MaxQuant output table to the normDat argument.")
   }
